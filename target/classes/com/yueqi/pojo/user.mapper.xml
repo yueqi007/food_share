@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="user">
+
+	<insert id="insertUser" parameterType="com.yueqi.pojo.User" useGeneratedKeys="true" keyProperty="id">
+		insert into User
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="username !=null and username !=''">
+			username,
+			</if>
+			<if test="createdate !=null and createdate !=''">
+			createdate,
+			</if>
+			<if test="password !=null and password !=''">
+			password,
+			</if>
+			<if test="phone !=null and phone !=''">
+			phone,
+			</if>
+			<!-- <if test="sendMessage !=null and sendMessage !=''">
+			sendMessage
+			</if> -->
+			<if test="sex !=null and sex !=''">
+			sex,
+			</if>
+			<if test="birthday !=null and birthday !=''">
+			birthday,
+			</if>
+		</trim> 
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			<if test="username!=null and username!=''">
+			#{username},
+			</if>
+			<if test="createdate !=null and createdate !=''">
+			#{createdate},
+			</if>
+			<if test="password !=null and password !=''">
+			#{password},
+			</if>
+			<if test="phone !=null and phone !=''">
+			#{phone},
+			</if>
+			<!-- <if test="sendMessage !=null and sendMessage !=''">
+			#{sendMessage}
+			</if> -->
+			<if test="sex !=null and sex !=''">
+			#{sex},
+			</if>
+			<if test="birthday !=null and birthday !=''">
+			#{brithday},
+			</if>
+		</trim>
+	</insert>
+	<select id="getByName" parameterType="String" resultType="com.yueqi.pojo.User">
+		select * from User where username=#{usernmae}
+	</select>
+	<select id="getById" parameterType="String" resultType="com.yueqi.pojo.User">
+		select * from User where id=#{id}
+	</select>
+	<select id="getTotalCount" parameterType="java.util.Map" resultType="int">
+		select count(*) from User where (status is null or status='')
+		<if test="name != null and name != ''">
+			and username like CONCAT('%',CONCAT(#{name},'%'))
+		</if>
+	</select>
+	<select id="queryAll" parameterType="java.util.Map" resultType="com.yueqi.pojo.User">
+		select * from User where (status is null or status='')
+		<if test="name != null and name != ''">
+			and username like CONCAT('%',CONCAT(#{name},'%'))
+		</if>
+		limit ${start},${limit}
+	</select>
+	<update id="updateUser" parameterType="com.yueqi.pojo.User" >
+		update User
+		<set>
+			<if test="username!=null and username!=''">
+			username = #{username},
+			</if>
+			<if test="phone!=null and phone!=''">
+			phone = #{phone},
+			</if>
+			<if test="password!=null and password!=''">
+			password = #{password},
+			</if>
+			<if test="birthday !=null ">
+			<!-- birthday = str_to_date(#{birthday,'’%Y-%m-%d'}) , -->
+			birthday = #{birthday,jdbcType=TIMESTAMP}, 
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<delete id="deleteUser" parameterType="java.util.List" >
+		update User set status="注销" where id in
+		<foreach item="id" collection="list" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

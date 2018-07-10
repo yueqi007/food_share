@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="comment">
+
+	<resultMap type="com.yueqi.pojo.Comment" id="commentResultMap">
+		<id property="id" column="id"/>
+		<result property="content" column="content"/>
+		<result property="to_uid" column="to_uid"/>
+		<result property="createdate" column="createdate"/>
+		<result property="pid" column="pid"/>
+		<result property="status" column="status"/>
+		<result property="isLeaf" column="isLeaf"/>
+		<association property="User" javaType="com.yueqi.pojo.User">
+			<id property="id" column="user_id"/>
+			<result property="username" column="username"/>
+			<result property="picPath" column="picPath"/>
+		</association>
+		
+		<!-- <association property="share" javaType="com.yueqi.pojo.Share">
+			<id property="id" column="share_id"/>
+			<result property="country" column="country"/>
+		</association> -->
+	</resultMap>
+	
+	<select id="selectById" parameterType="int" resultMap="commentResultMap">
+		<!-- select * from user u,share s,comment c where u.id=c.user_id and s.id=c.share_id and c.id=#{id} -->
+		select * from comment where id=#{id}
+	</select>
+	
+	
+	
+	
+	
+	
+
+	<insert id="insertUser" parameterType="com.yueqi.pojo.User" useGeneratedKeys="true" keyProperty="id">
+		insert into User
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="username !=null and username !=''">
+			username,
+			</if>
+			<if test="createdate !=null and createdate !=''">
+			createdate,
+			</if>
+			<if test="password !=null and password !=''">
+			password,
+			</if>
+			<if test="phone !=null and phone !=''">
+			phone,
+			</if>
+			<!-- <if test="sendMessage !=null and sendMessage !=''">
+			sendMessage
+			</if> -->
+			<if test="sex !=null and sex !=''">
+			sex,
+			</if>
+			<if test="birthday !=null and birthday !=''">
+			birthday,
+			</if>
+		</trim> 
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			<if test="username!=null and username!=''">
+			#{username},
+			</if>
+			<if test="createdate !=null and createdate !=''">
+			#{createdate},
+			</if>
+			<if test="password !=null and password !=''">
+			#{password},
+			</if>
+			<if test="phone !=null and phone !=''">
+			#{phone},
+			</if>
+			<!-- <if test="sendMessage !=null and sendMessage !=''">
+			#{sendMessage}
+			</if> -->
+			<if test="sex !=null and sex !=''">
+			#{sex},
+			</if>
+			<if test="birthday !=null and birthday !=''">
+			#{brithday},
+			</if>
+		</trim>
+	</insert>
+	<select id="getByName" parameterType="String" resultType="com.yueqi.pojo.User">
+		select * from User where username=#{usernmae}
+	</select>
+	<select id="getById" parameterType="String" resultType="com.yueqi.pojo.User">
+		select * from User where id=#{id}
+	</select>
+	<select id="getTotalCount" parameterType="java.util.Map" resultType="int">
+		select count(*) from User where (status is null or status='')
+		<if test="name != null and name != ''">
+			and username like CONCAT('%',CONCAT(#{name},'%'))
+		</if>
+	</select>
+	<select id="queryAll" parameterType="java.util.Map" resultType="com.yueqi.pojo.User">
+		select * from User where (status is null or status='')
+		<if test="name != null and name != ''">
+			and username like CONCAT('%',CONCAT(#{name},'%'))
+		</if>
+		limit ${start},${limit}
+	</select>
+	<update id="updateUser" parameterType="com.yueqi.pojo.User" >
+		update User
+		<set>
+			<if test="username!=null and username!=''">
+			username = #{username},
+			</if>
+			<if test="phone!=null and phone!=''">
+			phone = #{phone},
+			</if>
+			<if test="password!=null and password!=''">
+			password = #{password},
+			</if>
+			<if test="birthday !=null ">
+			<!-- birthday = str_to_date(#{birthday,'’%Y-%m-%d'}) , -->
+			birthday = #{birthday,jdbcType=TIMESTAMP}, 
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<delete id="deleteUser" parameterType="java.util.List" >
+		update User set status="注销" where id in
+		<foreach item="id" collection="list" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>
